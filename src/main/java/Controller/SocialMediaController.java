@@ -1,8 +1,11 @@
 package Controller;
 
+import java.util.List;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import DAO.AccountDAO;
 import Model.Account;
 import Model.Message;
 import Service.AccountService;
@@ -41,9 +44,9 @@ public class SocialMediaController {
         //As a user, I should be able to submit a new post on the endpoint POST localhost:8080/messages.
         app.post("messages", this::postMessage);
         //As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages.
-
+        app.get("messages", this::getMessage);
         //As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages/{message_id}.
-
+        app.get("messages/{message_id}", this::getMessageById);
         //As a User, I should be able to submit a DELETE request on the endpoint DELETE localhost:8080/messages/{message_id}.
 
         //As a user, I should be able to submit a PATCH request on the endpoint PATCH localhost:8080/messages/{message_id}.
@@ -86,15 +89,32 @@ public class SocialMediaController {
 
     private void postMessage(Context ctx) throws JsonProcessingException {
         
-        Message message = mapper.readValue(ctx.body(), Message.class);
+        Message message = mapper.readValue(ctx.body(),Message.class);
         Message addMessage = messageService.addMessage(message);
         
-        if(message != null){
+        if(message.getMessage_text() != "" && message.getMessage_text().length() <= 25 ){
             ctx.json(addMessage);
         }else{
             ctx.status(400);
         }
     }
+
+    private void getMessage(Context ctx) throws JsonProcessingException {
+        ctx.json(messageService.getAllMessages());
+    }
+
+    private void getMessageById(Context ctx) throws JsonProcessingException {
+        
+        int id = Integer.parseInt(ctx.pathParam("message_id")); 
+        Message getMessage = messageService.getMessageById(id);
+        if(getMessage !=null){
+            ctx.json(getMessage);
+        }else{
+            ctx.status(400);
+        }
+    }
+
+
 
 
 }
