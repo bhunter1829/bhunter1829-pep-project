@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import Model.Account;
+import Model.Message;
 import Service.AccountService;
+import Service.MessageService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
@@ -15,6 +17,7 @@ import io.javalin.http.Context;
  */
 public class SocialMediaController {
     AccountService accountService;
+    MessageService messageService;
     /**
      * In order for the test cases to work, you will need to write the endpoints in the startAPI() method, as the test
      * suite must receive a Javalin object from this method.
@@ -23,6 +26,7 @@ public class SocialMediaController {
 
      public SocialMediaController(){
         this.accountService = new AccountService();
+        this.messageService = new MessageService();
      }
 
     public Javalin startAPI() {
@@ -31,11 +35,11 @@ public class SocialMediaController {
         //test
       
         // As a user, I should be able to create a new Account on the endpoint POST localhost:8080/register. 
-        app.post("http://localhost:8080/register", this::postCreateAccount);
+        app.post("register", this::postCreateAccount);
         //As a user, I should be able to verify my login on the endpoint POST localhost:8080/login.
-
+        app.post("login", this::postLogin);
         //As a user, I should be able to submit a new post on the endpoint POST localhost:8080/messages.
-
+        app.post("messages", this::postMessage);
         //As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages.
 
         //As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages/{message_id}.
@@ -56,13 +60,37 @@ public class SocialMediaController {
     // private void exampleHandler(Context context) {
     //     context.json("sample text");
     // }
+    ObjectMapper mapper = new ObjectMapper();
 
     private void postCreateAccount(Context ctx) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
+        
         Account account = mapper.readValue(ctx.body(), Account.class);
         Account addedAccount = accountService.addAccount(account);
         if(addedAccount!=null){
-            ctx.json(mapper.writeValueAsString(addedAccount));
+            ctx.json(addedAccount);
+        }else{
+            ctx.status(400);
+        }
+    }
+
+    private void postLogin(Context ctx) throws JsonProcessingException { 
+     
+        Account account = mapper.readValue(ctx.body(), Account.class);
+        Account login = accountService.login(account);
+        if(login!=null){
+            ctx.json(login);
+        }else{
+            ctx.status(401);        //401 indicates improper authentication. Should return 401 instead of 400 in login endpoint if returned null
+        }
+    }
+
+    private void postMessage(Context ctx) throws JsonProcessingException {
+        
+        Message message = mapper.readValue(ctx.body(), Message.class);
+        Message addMessage = messageService.addMessage(message);
+        
+        if(message != null){
+            ctx.json(addMessage);
         }else{
             ctx.status(400);
         }

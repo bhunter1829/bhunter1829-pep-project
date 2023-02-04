@@ -34,5 +34,57 @@ public class AccountDAO {
         return null;
 
     }
+
+
+
+    public Account getByUsername(String username){          //Temp method, not in use. Used for testing/possible implementation. Ignore.
+                                                            
+        Connection connection = ConnectionUtil.getConnection();
+        try{
+            String sql = "SELECT * FROM account WHERE username = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+
+            preparedStatement.setString(1, username);
+            ResultSet rs = preparedStatement.executeQuery();
+            while(rs.next()){
+                Account account = new Account(rs.getInt("account_id"),
+                    rs.getString("username"),
+                    rs.getString("password"));
+                return account;
+            }
+
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+
+
+    
+    public Account loginConfirm(Account loginAccount){          
+        
+        Connection connection = ConnectionUtil.getConnection();
+        try{
+            String sql = "SELECT * FROM account WHERE username = ? AND password = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+
+            preparedStatement.setString(1, loginAccount.getUsername());
+            preparedStatement.setString(2, loginAccount.getPassword());
+            ResultSet rs = preparedStatement.executeQuery();
+            while(rs.next()){
+                Account account = new Account(rs.getInt("account_id"),
+                    rs.getString("username"),
+                    rs.getString("password"));
+                return account;
+                }
+
+            }catch(SQLException e){
+                System.out.println(e.getMessage());
+            }
+            return null;
+        }
     
 }
