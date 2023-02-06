@@ -4,13 +4,13 @@ import DAO.MessageDAO;
 
 import java.util.List;
 
-import DAO.AccountDAO;
+
 import Model.Message;
 
 
 public class MessageService {
     private MessageDAO messageDAO;
-    private AccountDAO accountDAO;
+    
 
     public MessageService(){
         messageDAO = new MessageDAO();
@@ -21,15 +21,12 @@ public class MessageService {
     }
 
     public Message addMessage(Message message){
-        // if(message.getMessage_text() == "" || message.getMessage_text().length() >= 255 || accountDAO.getByUserId(message.getPosted_by()) == null){
-        //     return null;
-        // }
+        if(message.getMessage_text().length() > 0 && message.getMessage_text().length() < 255 && message.getPosted_by() >=0){
+            return messageDAO.insertMessage(message);
+        }
+            return null;
         
-        //500 error, 3 things tests reporting 500 and not getting filtered here.
-     
-        return messageDAO.insertMessage(message);
-       
-        
+         
     }
 
     public List<Message> getAllMessages(){
@@ -39,5 +36,25 @@ public class MessageService {
     public Message getMessageById(int id) {
         return messageDAO.getMessageById(id);
     }
-    
+
+    public Message deleteMessageById(int id){
+        
+            Message message = messageDAO.getMessageById(id);
+            messageDAO.deleteMessage(id);
+        return message;
+        }
+
+    public Message patchMessage(Message message, int id){
+         if(message.getMessage_text().length() > 0 && message.getMessage_text().length() < 255 && messageDAO.getMessageById(id) != null){
+           messageDAO.updateMessage(message, id);
+           return messageDAO.getMessageById(id);
+         }
+         return null;
+    }
+
+    public List<Message> getAllByAccountId(int id){
+
+           return messageDAO.getAllMessagesByAccount(id);
+       
+    }
 }
