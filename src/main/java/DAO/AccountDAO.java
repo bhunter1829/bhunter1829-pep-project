@@ -1,7 +1,6 @@
 package DAO;
 
-import java.util.ArrayList;
-import java.util.List;
+
 import java.sql.*;
 
 import Model.Account;
@@ -11,7 +10,7 @@ import Util.ConnectionUtil;
 
 public class AccountDAO {
 
-    public Account insertAccount(Account account){
+    public Account insertAccount(Account account){      //Insert new account using username + password, returns generated key id + username + password.
         Connection connection = ConnectionUtil.getConnection();
         
         try {
@@ -34,36 +33,8 @@ public class AccountDAO {
         return null;
 
     }
-
-
-
-    public Account getByUserId(int id){          //Temp method, not in use. Used for testing/possible implementation. Ignore.
-                                                            
-        Connection connection = ConnectionUtil.getConnection();
-        try{
-            String sql = "SELECT * FROM account WHERE account_id = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-
-
-            preparedStatement.setInt(1, id);
-            ResultSet rs = preparedStatement.executeQuery();
-            while(rs.next()){
-                Account account = new Account(rs.getInt("account_id"),
-                    rs.getString("username"),
-                    rs.getString("password"));
-                return account;
-            }
-
-        }catch(SQLException e){
-            System.out.println(e.getMessage());
-        }
-        return null;
-    }
-
-
-
     
-    public Account loginConfirm(Account loginAccount){          
+    public Account loginConfirm(Account loginAccount){    //Selects username and password and returns confirming authentication, if username or password don't exist then return null.          
         
         Connection connection = ConnectionUtil.getConnection();
         try{

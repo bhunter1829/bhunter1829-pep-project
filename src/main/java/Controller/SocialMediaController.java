@@ -1,3 +1,6 @@
+//Social Media Blog API Project by Brenden Hunter
+//Following REST architecture. All Tests passed, documentation where needed
+
 package Controller;
 
 import java.util.List;
@@ -12,19 +15,12 @@ import Service.MessageService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
-/**
- * TODO: You will need to write your own endpoints and handlers for your controller. The endpoints you will need can be
- * found in readme.md as well as the test cases. You should
- * refer to prior mini-project labs and lecture materials for guidance on how a controller may be built.
- */
+
+
 public class SocialMediaController {
     AccountService accountService;
     MessageService messageService;
-    /**
-     * In order for the test cases to work, you will need to write the endpoints in the startAPI() method, as the test
-     * suite must receive a Javalin object from this method.
-     * @return a Javalin app object which defines the behavior of the Javalin controller.
-     */
+   
 
      public SocialMediaController(){
         this.accountService = new AccountService();
@@ -33,38 +29,41 @@ public class SocialMediaController {
 
     public Javalin startAPI() {
         Javalin app = Javalin.create();
-       // app.get("example-endpoint", this::exampleHandler);
-        //test
+      
       
         // As a user, I should be able to create a new Account on the endpoint POST localhost:8080/register. 
         app.post("register", this::postCreateAccount);
+
         //As a user, I should be able to verify my login on the endpoint POST localhost:8080/login.
         app.post("login", this::postLogin);
+
         //As a user, I should be able to submit a new post on the endpoint POST localhost:8080/messages.
         app.post("messages", this::postMessage);
+
         //As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages.
         app.get("messages", this::getMessage);
+
         //As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages/{message_id}.
         app.get("messages/{message_id}", this::getMessageById);
+
         //As a User, I should be able to submit a DELETE request on the endpoint DELETE localhost:8080/messages/{message_id}.
         app.delete("messages/{message_id}", this::deleteMessageById);
+
         //As a user, I should be able to submit a PATCH request on the endpoint PATCH localhost:8080/messages/{message_id}.
         app.patch("messages/{message_id}", this::patchMessage);
+
         //As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/accounts/{account_id}/messages.
         app.get("accounts/{account_id}/messages", this::getByAccountId);
+
         return app;
     }
 
-    /**
-     * This is an example handler for an example endpoint.
-     * @param context The Javalin Context object manages information about both the HTTP request and response.
-     */
-    // private void exampleHandler(Context context) {
-    //     context.json("sample text");
-    // }
-    ObjectMapper mapper = new ObjectMapper();
 
-    private void postCreateAccount(Context ctx) throws JsonProcessingException {
+    ObjectMapper mapper = new ObjectMapper();
+    //The purpose of every endpoint is explained above. All of these will run properly unless the Service class or DAO returns null.
+    //Most if not all adjusting should be done in the service class. Making it easier for adding/changing things in the future.
+
+    private void postCreateAccount(Context ctx) throws JsonProcessingException {        
         
         Account account = mapper.readValue(ctx.body(), Account.class);
         Account addedAccount = accountService.addAccount(account);
@@ -82,7 +81,7 @@ public class SocialMediaController {
         if(login!=null){
             ctx.json(login);
         }else{
-            ctx.status(401);        //401 indicates improper authentication. Should return 401 instead of 400 in login endpoint if returned null
+            ctx.status(401);        //401 indicates improper authentication. Should return 401 instead of 400 if login endpoint is returned null.
         }
     }
 
@@ -120,7 +119,7 @@ public class SocialMediaController {
         if(deleteMessage != null){
             ctx.json(deleteMessage);
         }else{
-            ctx.status(200);
+            ctx.json("");   //return empty response on null.
         }
     }
 
@@ -142,7 +141,7 @@ public class SocialMediaController {
         int id = Integer.parseInt(ctx.pathParam("account_id"));
         List<Message> message = messageService.getAllByAccountId(id);
         if(message != null){
-            ctx.json(mapper.writeValueAsString(message));
+            ctx.json(message);
         }else {
             ctx.status(400);
         }

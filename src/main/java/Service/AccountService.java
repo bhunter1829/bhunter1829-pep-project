@@ -3,6 +3,10 @@ package Service;
 import DAO.AccountDAO;
 import Model.Account;
 
+// * The purpose of a Service class is to contain "business logic" that sits between the web layer (controller) and
+// * persistence layer (DAO). That means that the Service class performs tasks that aren't done through the web or
+// * SQL: programming tasks like checking that the input is valid, conducting additional security checks, or saving the
+// * actions undertaken by the API to a logging file.
 
 public class AccountService {
     private AccountDAO accountDAO;
@@ -22,7 +26,7 @@ public class AccountService {
         return null;                                                            //if either is met return null.
        }
 
-        return accountDAO.insertAccount(account);                               //create user being passed in
+        return accountDAO.insertAccount(account);                               
 
        
     }

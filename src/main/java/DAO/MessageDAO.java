@@ -15,15 +15,15 @@ public class MessageDAO {
             try {
                 String sql = "INSERT INTO message (posted_by, message_text, time_posted_epoch) VALUES (?,?,?)";
                 PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-
+                //Generates key, assigns values and returns the new message information.
                 preparedStatement.setInt(1, message.getPosted_by());
                 preparedStatement.setString(2, message.getMessage_text());
                 preparedStatement.setLong(3, message.getTime_posted_epoch());
 
                 preparedStatement.executeUpdate();
-                ResultSet primarykeyRSet = preparedStatement.getGeneratedKeys();
-                if(primarykeyRSet.next()){
-                    int generated_message_id = (int) primarykeyRSet.getLong(1);
+                ResultSet rs = preparedStatement.getGeneratedKeys();
+                if(rs.next()){
+                    int generated_message_id = (int) rs.getLong(1);
                     return new Message(generated_message_id, message.getPosted_by(), message.getMessage_text(), message.getTime_posted_epoch());
                 }
 
@@ -47,7 +47,7 @@ public class MessageDAO {
                         rs.getInt("message_id"),
                         rs.getInt("posted_by"),
                         rs.getString("message_text"),
-                        rs.getLong("time_posted_epoch"));  //getLong
+                        rs.getLong("time_posted_epoch"));  
                     messages.add(MessageList);
 
                 }
@@ -74,7 +74,7 @@ public class MessageDAO {
                         rs.getInt("message_id"),
                         rs.getInt("posted_by"),
                         rs.getString("message_text"),
-                        rs.getLong("time_posted_epoch"));  //getLong
+                        rs.getLong("time_posted_epoch"));  
                     return message;
                 }
             }catch(SQLException e){
@@ -84,7 +84,7 @@ public class MessageDAO {
 
         }
 
-        public Message deleteMessage(int id){
+        public void deleteMessage(int id){
             Connection connection = ConnectionUtil.getConnection();
 
             try{
@@ -93,26 +93,12 @@ public class MessageDAO {
 
                 preparedStatement.setInt(1, id);
 
-                int deleted = preparedStatement.executeUpdate();
-                if(deleted == 1){
-                    String sql1 = "SELECT * FROM message WHERE message_id = ?";
-                    PreparedStatement  preparedStatement1 = connection.prepareStatement(sql1);
-                    preparedStatement1.setInt(1, id);
-
-                ResultSet rs = preparedStatement1.executeQuery();
-                while(rs.next()){
-                    Message message = new Message(
-                        rs.getInt("message_id"),
-                        rs.getInt("posted_by"),
-                        rs.getString("message_text"),
-                        rs.getLong("time_posted_epoch"));
-                        return message;
-                }
-            }
+                preparedStatement.executeUpdate();
+           
             }catch(SQLException e){
                 System.out.println(e.getMessage());
             }
-            return null;
+            
         }
 
 
@@ -140,7 +126,7 @@ public class MessageDAO {
             List<Message>messages = new ArrayList<>();
 
             try{
-                String sql = "Select * FROM message WHERE posted_by = ?";       //We can use postedby since it's a foriegn key to accountid
+                String sql = "Select * FROM message WHERE posted_by = ?";       //We use postedby since it's a foriegn key to accountid
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
                 preparedStatement.setInt(1, id);
@@ -151,7 +137,7 @@ public class MessageDAO {
                         rs.getInt("message_id"),
                         rs.getInt("posted_by"),
                         rs.getString("message_text"),
-                        rs.getLong("time_posted_epoch"));  //getLong
+                        rs.getLong("time_posted_epoch"));  
                     messages.add(MessageList);
 
                 }
